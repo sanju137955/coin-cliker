@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Coin Clicker PRO</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial;
+    background: #0f172a;
+    color: white;
+    display: flex;
+    height: 100vh;
+    user-select: none;
+}
+
+/* LEFT GAME AREA */
+.game {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#coin {
+    width: 180px;
+    cursor: pointer;
+    transition: 0.1s;
+}
+
+#coin:active {
+    transform: scale(0.85);
+}
+
+#score {
+    font-size: 32px;
+}
+
+/* RIGHT SHOP PANEL */
+.shop {
+    width: 300px;
+    background: #1e293b;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.shop h2 {
+    margin-top: 0;
+}
+
+.item {
+    background: #334155;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.item:hover {
+    background: #475569;
+}
+
+/* THEMES */
+.dark { background: #0f172a; }
+.light { background: #f1f5f9; color: black; }
+.neon { background: black; color: #39ff14; }
+
+.floating {
+    position: absolute;
+    color: gold;
+    pointer-events: none;
+    animation: floatUp 1s forwards;
+}
+
+@keyframes floatUp {
+    to { transform: translateY(-60px); opacity: 0; }
+}
+</style>
+</head>
+
+<body class="dark">
+
+<div class="game">
+    <h1>💰 Coin Clicker</h1>
+    <h2 id="score">Coins: 0</h2>
+    <img id="coin" src="https://cdn-icons-png.flaticon.com/512/138/138292.png">
+</div>
+
+<div class="shop">
+    <h2>🛒 Shop</h2>
+
+    <div class="item" onclick="buyClick()">
+        💼 Businessman (+1 click) - <span id="clickCost"></span>
+    </div>
+
+    <div class="item" onclick="buyAuto()">
+        🍔 Food Stall (+1/sec) - <span id="autoCost"></span>
+    </div>
+
+    <div class="item" onclick="boost()">
+        ⚡ Energy Drink (x2 5s) - Cost: 100
+    </div>
+
+    <h2>🎨 Themes</h2>
+
+    <div class="item" onclick="setTheme('dark')">🌑 Dark</div>
+    <div class="item" onclick="setTheme('light')">🌕 Light</div>
+    <div class="item" onclick="setTheme('neon')">💚 Neon</div>
+
+</div>
+
+<script>
+let coins = 0;
+let clickPower = 1;
+let autoIncome = 0;
+
+let clickCost = 10;
+let autoCost = 50;
+
+let boostActive = false;
+
+function update() {
+    document.getElementById("score").innerText = "Coins: " + coins;
+    document.getElementById("clickCost").innerText = clickCost;
+    document.getElementById("autoCost").innerText = autoCost;
+}
+
+document.getElementById("coin").onclick = function(e) {
+    let gain = clickPower;
+    if (boostActive) gain *= 2;
+
+    coins += gain;
+    update();
+    floatText("+" + gain, e);
+};
+
+function buyClick() {
+    if (coins >= clickCost) {
+        coins -= clickCost;
+        clickPower++;
+        clickCost = Math.floor(clickCost * 1.5);
+        update();
+    }
+}
+
+function buyAuto() {
+    if (coins >= autoCost) {
+        coins -= autoCost;
+        autoIncome++;
+        autoCost = Math.floor(autoCost * 1.6);
+        update();
+    }
+}
+
+function boost() {
+    if (coins >= 100 && !boostActive) {
+        coins -= 100;
+        boostActive = true;
+        update();
+
+        setTimeout(() => boostActive = false, 5000);
+    }
+}
+
+setInterval(() => {
+    coins += autoIncome;
+    update();
+}, 1000);
+
+function floatText(text, e) {
+    let el = document.createElement("div");
+    el.className = "floating";
+    el.innerText = text;
+    el.style.left = e.clientX + "px";
+    el.style.top = e.clientY + "px";
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 1000);
+}
+
+function setTheme(theme) {
+    document.body.className = theme;
+}
+
+update();
+</script>
+
+</body>
+</html>
